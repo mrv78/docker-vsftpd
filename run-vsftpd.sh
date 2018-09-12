@@ -19,10 +19,20 @@ fi
 
 # Create home dir and update vsftpd user db:
 mkdir -p "/home/vsftpd/${FTP_USER}"
+
+echo -e "${FTP_USER}\n${FTP_PASS}" > /etc/vsftpd/env_user.txt
+if [ -s /etc/vsftpd/virtual_users.txt ]
+then
+  cat /etc/vsftpd/env_user.txt /etc/vsftpd/virtual_users.txt>/etc/vsftpd/user_for_save.txt
+fi
+#create directories
+for us in $(sed 'n; d' /etc/vsftpd/user_for_save.txt) ; do mkdir -p /home/vsftpd/$us;done
+
+/usr/bin/db_load -T -t hash -f /etc/vsftpd/user_for_save.txt /etc/vsftpd/virtual_users.db
+rm -f /etc/vsftpd/user_for_save.txt
+
 chown -R ftp:ftp /home/vsftpd/
 
-echo -e "${FTP_USER}\n${FTP_PASS}" > /etc/vsftpd/virtual_users.txt
-/usr/bin/db_load -T -t hash -f /etc/vsftpd/virtual_users.txt /etc/vsftpd/virtual_users.db
 
 # Set passive mode parameters:
 if [ "$PASV_ADDRESS" = "**IPv4**" ]; then
