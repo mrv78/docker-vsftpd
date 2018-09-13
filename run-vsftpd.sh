@@ -7,7 +7,7 @@ fi
 
 # If no env var has been specified, generate a random password for FTP_USER:
 if [ "$FTP_PASS" = "**Random**" ]; then
-    export FTP_PASS=`cat /dev/urandom | tr -dc A-Z-a-z-0-9 | head -c${1:-16}`
+    export FTP_PASS=`cat /dev/urandom | tr -dc A-Z-a-z-0-9 | head -c8`
 fi
 
 # Do not log to STDOUT by default:
@@ -32,7 +32,6 @@ for us in $(sed 'n; d' /etc/vsftpd/user_for_save.txt) ; do mkdir -p /home/vsftpd
 rm -f /etc/vsftpd/user_for_save.txt
 
 chown -R ftp:ftp /home/vsftpd/
-
 
 # Set passive mode parameters:
 if [ "$PASV_ADDRESS" = "**IPv4**" ]; then
